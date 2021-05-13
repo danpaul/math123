@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Book Base Journal</title>
+    <meta name="description" content="The place for books on the web" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+  </head>
+
+  <body>
+    <div id="app" class="container">
+      <h1>Book Base Journal</h1>
+      <div v-if="loading">Loading...</div>
+      <div v-else></div>
+    </div>
+
+    <script>
+      Vue.config.productionTip = false;
+      const app = new Vue({
+        el: "#app",
+        data: {
+          loading: true,
+        },
+        methods: {},
+        mounted() {},
+      });
+    </script>
+  </body>
+</html>

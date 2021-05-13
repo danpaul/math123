@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Math 1 2 3</title>
+    <meta name="description" content="The place to lear math" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+  </head>
+
+  <body>
+    <div id="app" class="container">
+      <h1>Math 1 2 3</h1>
+      <form @submit="handleSubmit">
+        <h2 style="font-weight: bold">
+          {{number1}} + {{number2}} =
+          <input type="answer" id="answer" name="answer" v-model="answer" @ />
+        </h2>
+      </form>
+      <div v-if="correct === true">
+        <h3>That's right!</h3>
+      </div>
+      <div v-if="errorMessage">
+        <h3 style="color: red; font-weight: bold">
+          Sorry, the correct answer is: {{ errorMessage }}
+        </h3>
+      </div>
+      <div v-if="correct === true">
+        <h3 style="color: blue; font-weight: bold">Good job, that's right!</h3>
+      </div>
+      <div>
+        <h4 style="font-weight: bold">Current level: {{ this.maxNumber }}</h4>
+      </div>
+    </div>
+
+    <script>
+      Vue.config.productionTip = false;
+      const app = new Vue({
+        el: "#app",
+        data() {
+          return {
+            maxNumber: 1,
+            number1: this.getRandomNumber(0, 1),
+            number2: this.getRandomNumber(0, 1),
+            correct: null,
+            answer: "",
+            correctAnswer: null,
+            correctAnswerInARow: 0,
+            errorMessage: "",
+            levelToWin: 10,
+          };
+        },
+        methods: {
+          getRandomNumber(minIn, maxIn) {
+            const min = Math.ceil(minIn);
+            const max = Math.floor(maxIn);
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+          },
+          // asdf
+          submit() {
+            this.correctAnswer = this.number1 + this.number2;
+            const correct = Number(this.answer) === this.correctAnswer;
+            this.correct = correct;
+            if (this.correct) {
+              this.maxNumber += 1;
+            } else {
+              this.maxNumber -= 1;
+            }
+          },
+          handleSubmit(e) {
+            e.preventDefault();
+            this.correctAnswer = this.number1 + this.number2;
+            const correct = Number(this.answer) === this.correctAnswer;
+            this.correct = correct;
+            if (this.correct) {
+              this.correctAnswerInARow += 1;
+              this.errorMessage = "";
+              if (this.correctAnswerInARow >= this.maxNumber) {
+                this.maxNumber += 1;
+                if (this.maxNumber > this.levelToWin) {
+                  alert("Good job, you won!!!");
+                  this.correctAnswerInARow = 0;
+                  this.maxNumber = 1;
+                } else {
+                  this.correctAnswerInARow = 0;
+                }
+              }
+            } else {
+              this.correctAnswerInARow = 0;
+              this.errorMessage = `${this.number1} + ${this.number2} = ${this.correctAnswer}`;
+              if (this.maxNumber > 1) {
+                this.maxNumber -= 1;
+              }
+            }
+            this.next();
+          },
+          next() {
+            this.answer = "";
+            this.number1 = this.getRandomNumber(0, this.maxNumber);
+            this.number2 = this.getRandomNumber(0, this.maxNumber);
+          },
+        },
+      });
+    </script>
+  </body>
+</html>
