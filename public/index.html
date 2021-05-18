@@ -21,10 +21,51 @@
 
   <body>
     <div id="app" class="container">
+      <div
+        v-if="youWon"
+        style="
+          position: fixed;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          background-color: rgba(125, 125, 125, 0.5);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        "
+      >
+        <iframe
+          src="https://giphy.com/embed/cOtvwSHKaFK3Ul1VVu"
+          width="480"
+          height="270"
+          frameborder="0"
+          class="giphy-embed"
+          allowfullscreen
+        ></iframe>
+      </div>
       <h1>Math 1 2 3</h1>
+      <div style="margin-bottom: 20px">
+        <button
+          :class="{
+            'button-outline': !isAddition
+          }"
+          @click="handleTypeSelect('addition')"
+        >
+          Addition
+        </button>
+        <button
+          :class="{
+            'button-outline': isAddition
+          }"
+          @click="handleTypeSelect('subtraction')"
+        >
+          Subtraction
+        </button>
+      </div>
       <form @submit="handleSubmit">
         <h2 style="font-weight: bold">
-          {{number1}} + {{number2}} =
+          {{number1}} {{ isAddition ? '+' : '-'}} {{number2}} =
           <input type="answer" id="answer" name="answer" v-model="answer" @ />
         </h2>
       </form>
@@ -50,6 +91,7 @@
         el: "#app",
         data() {
           return {
+            gameType: "subtraction",
             maxNumber: 1,
             number1: this.getRandomNumber(0, 1),
             number2: this.getRandomNumber(0, 1),
@@ -59,7 +101,13 @@
             correctAnswerInARow: 0,
             errorMessage: "",
             levelToWin: 10,
+            youWon: false,
           };
+        },
+        computed: {
+          isAddition() {
+            return this.gameType === "addition";
+          },
         },
         methods: {
           getRandomNumber(minIn, maxIn) {
@@ -67,20 +115,11 @@
             const max = Math.floor(maxIn);
             return Math.floor(Math.random() * (max - min + 1)) + min;
           },
-          // asdf
-          submit() {
-            this.correctAnswer = this.number1 + this.number2;
-            const correct = Number(this.answer) === this.correctAnswer;
-            this.correct = correct;
-            if (this.correct) {
-              this.maxNumber += 1;
-            } else {
-              this.maxNumber -= 1;
-            }
-          },
           handleSubmit(e) {
             e.preventDefault();
-            this.correctAnswer = this.number1 + this.number2;
+            this.correctAnswer = this.isAddition
+              ? this.number1 + this.number2
+              : this.number1 - this.number2;
             const correct = Number(this.answer) === this.correctAnswer;
             this.correct = correct;
             if (this.correct) {
@@ -89,7 +128,7 @@
               if (this.correctAnswerInARow >= this.maxNumber) {
                 this.maxNumber += 1;
                 if (this.maxNumber > this.levelToWin) {
-                  alert("Good job, you won!!!");
+                  this.youWon = true;
                   this.correctAnswerInARow = 0;
                   this.maxNumber = 1;
                 } else {
@@ -98,7 +137,9 @@
               }
             } else {
               this.correctAnswerInARow = 0;
-              this.errorMessage = `${this.number1} + ${this.number2} = ${this.correctAnswer}`;
+              this.errorMessage = `${this.number1} ${
+                this.isAddition ? "+" : "-"
+              } ${this.number2} = ${this.correctAnswer}`;
               if (this.maxNumber > 1) {
                 this.maxNumber -= 1;
               }
@@ -107,8 +148,20 @@
           },
           next() {
             this.answer = "";
-            this.number1 = this.getRandomNumber(0, this.maxNumber);
-            this.number2 = this.getRandomNumber(0, this.maxNumber);
+            const number1 = this.getRandomNumber(0, this.maxNumber);
+            const number2 = this.getRandomNumber(0, this.maxNumber);
+            if (this.isAddition) {
+              this.number1 = number1;
+              this.number2 = number2;
+            } else {
+              this.number1 = number1 > number2 ? number1 : number2;
+              this.number2 = number1 < number2 ? number1 : number2;
+            }
+          },
+          handleTypeSelect(type) {
+            this.gameType = type;
+            this.maxNumber = 1;
+            this.next();
           },
         },
       });
