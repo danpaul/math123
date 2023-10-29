@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <title>Math 1 2 3</title>
-    <meta name="description" content="The place to lear math" />
+    <meta name="description" content="The place to learn math" />
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic"
@@ -166,7 +166,7 @@
             this.answer = "";
             const number1 = this.getRandomNumber(0, this.maxNumber);
             const number2 = this.getRandomNumber(0, this.maxNumber);
-            if (this.gameType === "addition") {
+            if (this.gameType !== "subtraction") {
               this.number1 = number1;
               this.number2 = number2;
             } else {
