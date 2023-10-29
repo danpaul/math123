@@ -48,7 +48,7 @@
       <div style="margin-bottom: 20px">
         <button
           :class="{
-            'button-outline': !isAddition
+            'button-outline': gameType !== 'addition'
           }"
           @click="handleTypeSelect('addition')"
         >
@@ -56,16 +56,25 @@
         </button>
         <button
           :class="{
-            'button-outline': isAddition
+            'button-outline': gameType !== 'subtraction'
           }"
           @click="handleTypeSelect('subtraction')"
         >
           Subtraction
         </button>
+        <button
+          :class="{
+          'button-outline': gameType !== 'multiplication'
+        }"
+          @click="handleTypeSelect('multiplication')"
+        >
+          Multiplication
+        </button>
       </div>
       <form @submit="handleSubmit">
         <h2 style="font-weight: bold">
-          {{number1}} {{ isAddition ? '+' : '-'}} {{number2}} =
+          {{number1}} {{ gameType === 'addition' ? '+' : gameType ===
+          'subtraction' ? '-' : '*'}} {{number2}} =
           <input type="answer" id="answer" name="answer" v-model="answer" @ />
         </h2>
       </form>
@@ -117,9 +126,12 @@
           },
           handleSubmit(e) {
             e.preventDefault();
-            this.correctAnswer = this.isAddition
-              ? this.number1 + this.number2
-              : this.number1 - this.number2;
+            this.correctAnswer =
+              this.gameType === "addition"
+                ? this.number1 + this.number2
+                : this.gameType === "subtraction"
+                ? this.number1 - this.number2
+                : this.number1 * this.number2;
             const correct = Number(this.answer) === this.correctAnswer;
             this.correct = correct;
             if (this.correct) {
@@ -138,7 +150,11 @@
             } else {
               this.correctAnswerInARow = 0;
               this.errorMessage = `${this.number1} ${
-                this.isAddition ? "+" : "-"
+                this.gameType === "addition"
+                  ? "+"
+                  : this.gameType === "subtraction"
+                  ? "-"
+                  : "*"
               } ${this.number2} = ${this.correctAnswer}`;
               if (this.maxNumber > 1) {
                 this.maxNumber -= 1;
@@ -150,7 +166,7 @@
             this.answer = "";
             const number1 = this.getRandomNumber(0, this.maxNumber);
             const number2 = this.getRandomNumber(0, this.maxNumber);
-            if (this.isAddition) {
+            if (this.gameType === "addition") {
               this.number1 = number1;
               this.number2 = number2;
             } else {
