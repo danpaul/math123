@@ -70,11 +70,27 @@
         >
           Multiplication
         </button>
+        <button
+          :class="{
+            'button-outline': gameType !== 'advancedAddition'
+          }"
+          @click="handleTypeSelect('advancedAddition')"
+        >
+          Advanced Addition
+        </button>
+        <button
+          :class="{
+            'button-outline': gameType !== 'advancedSubtraction'
+          }"
+          @click="handleTypeSelect('advancedSubtraction')"
+        >
+          Advanced Subtraction
+        </button>
       </div>
       <form @submit="handleSubmit">
         <h2 style="font-weight: bold">
-          {{number1}} {{ gameType === 'addition' ? '+' : gameType ===
-          'subtraction' ? '-' : '*'}} {{number2}} =
+          {{number1}} {{ gameType === 'addition' || gameType === 'advancedAddition' ? '+' : gameType ===
+          'subtraction' || gameType === 'advancedSubtraction' ? '-' : '*'}} {{number2}} =
           <input type="answer" id="answer" name="answer" v-model="answer" @ />
         </h2>
       </form>
@@ -126,10 +142,14 @@
           },
           handleSubmit(e) {
             e.preventDefault();
+            // Ignore submission if answer is empty or just whitespace
+            if (!this.answer || this.answer.trim() === "") {
+              return;
+            }
             this.correctAnswer =
-              this.gameType === "addition"
+              this.gameType === "addition" || this.gameType === "advancedAddition"
                 ? this.number1 + this.number2
-                : this.gameType === "subtraction"
+                : this.gameType === "subtraction" || this.gameType === "advancedSubtraction"
                 ? this.number1 - this.number2
                 : this.number1 * this.number2;
             const correct = Number(this.answer) === this.correctAnswer;
@@ -139,10 +159,11 @@
               this.errorMessage = "";
               if (this.correctAnswerInARow >= this.maxNumber) {
                 this.maxNumber += 1;
-                if (this.maxNumber > this.levelToWin) {
+                const maxLevel = this.gameType === "advancedAddition" || this.gameType === "advancedSubtraction" ? 15 : this.levelToWin;
+                if (this.maxNumber > maxLevel) {
                   this.youWon = true;
                   this.correctAnswerInARow = 0;
-                  this.maxNumber = 1;
+                  this.maxNumber = this.gameType === "advancedAddition" || this.gameType === "advancedSubtraction" ? 6 : 1;
                 } else {
                   this.correctAnswerInARow = 0;
                 }
@@ -150,13 +171,14 @@
             } else {
               this.correctAnswerInARow = 0;
               this.errorMessage = `${this.number1} ${
-                this.gameType === "addition"
+                this.gameType === "addition" || this.gameType === "advancedAddition"
                   ? "+"
-                  : this.gameType === "subtraction"
+                  : this.gameType === "subtraction" || this.gameType === "advancedSubtraction"
                   ? "-"
                   : "*"
               } ${this.number2} = ${this.correctAnswer}`;
-              if (this.maxNumber > 1) {
+              const minLevel = this.gameType === "advancedAddition" || this.gameType === "advancedSubtraction" ? 6 : 1;
+              if (this.maxNumber > minLevel) {
                 this.maxNumber -= 1;
               }
             }
@@ -166,17 +188,19 @@
             this.answer = "";
             const number1 = this.getRandomNumber(0, this.maxNumber);
             const number2 = this.getRandomNumber(0, this.maxNumber);
-            if (this.gameType !== "subtraction") {
-              this.number1 = number1;
-              this.number2 = number2;
-            } else {
+            if (this.gameType === "subtraction" || this.gameType === "advancedSubtraction") {
               this.number1 = number1 > number2 ? number1 : number2;
               this.number2 = number1 < number2 ? number1 : number2;
+            } else {
+              this.number1 = number1;
+              this.number2 = number2;
             }
           },
           handleTypeSelect(type) {
             this.gameType = type;
-            this.maxNumber = 1;
+            this.maxNumber = type === "advancedAddition" || type === "advancedSubtraction" ? 6 : 1;
+            this.correctAnswerInARow = 0;
+            this.youWon = false;
             this.next();
           },
         },
